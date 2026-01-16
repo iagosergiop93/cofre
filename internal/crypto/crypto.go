@@ -1,4 +1,5 @@
-package main
+// Package crypto provides cryptographic operations for the secrets vault.
+package crypto
 
 import (
 	"crypto/aes"
@@ -10,20 +11,20 @@ import (
 )
 
 const (
-	SaltSize   = 16
-	NonceSize  = 12
-	KeySize    = 32
-	ArgonTime  = 1
-	ArgonMem   = 64 * 1024 // 64 MB
+	SaltSize     = 16
+	NonceSize    = 12
+	KeySize      = 32
+	ArgonTime    = 1
+	ArgonMem     = 64 * 1024 // 64 MB
 	ArgonThreads = 4
 )
 
-// DeriveKey derives a 32-byte key from a password using Argon2id
+// DeriveKey derives a 32-byte key from a password using Argon2id.
 func DeriveKey(password string, salt []byte) []byte {
 	return argon2.IDKey([]byte(password), salt, ArgonTime, ArgonMem, ArgonThreads, KeySize)
 }
 
-// GenerateSalt generates a random 16-byte salt
+// GenerateSalt generates a random 16-byte salt.
 func GenerateSalt() ([]byte, error) {
 	salt := make([]byte, SaltSize)
 	if _, err := rand.Read(salt); err != nil {
@@ -32,7 +33,7 @@ func GenerateSalt() ([]byte, error) {
 	return salt, nil
 }
 
-// Encrypt encrypts plaintext using AES-256-GCM and returns nonce + ciphertext
+// Encrypt encrypts plaintext using AES-256-GCM and returns nonce + ciphertext.
 func Encrypt(plaintext, key []byte) (nonce, ciphertext []byte, err error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -53,7 +54,7 @@ func Encrypt(plaintext, key []byte) (nonce, ciphertext []byte, err error) {
 	return nonce, ciphertext, nil
 }
 
-// Decrypt decrypts ciphertext using AES-256-GCM
+// Decrypt decrypts ciphertext using AES-256-GCM.
 func Decrypt(ciphertext, nonce, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
